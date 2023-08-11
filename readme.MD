@@ -23,3 +23,5 @@ Makefile also contains useful shortcuts for various tasks like running against t
 
 Navigate to the URL where the app is running, and enter the URL you want to be shortened. Simple!
 
+Follow the provided link to be redirected to the long version of the URL. Should work with paths and query params if provided.
+
