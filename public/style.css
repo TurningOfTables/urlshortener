@@ -1,0 +1,74 @@
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes flashInOut {
+    0% {
+        opacity: 0;
+    }
+
+    33% {
+        opacity: 1;
+    }
+
+    66% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+input#longUrl {
+    width: 50%;
+    height: 45px;
+    font-size: 30px;
+    border: 2px solid purple;
+}
+
+input#longUrl.error {
+    border-color: red;
+}
+
+input#submitButton {
+    background-color: purple;
+    border: none;
+    color: white;
+    padding: 10px 15px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+}
+
+h1 {
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+
+.toggle-visible {
+    visibility: hidden;
+}
+
+.toggle-visible.is-visible {
+    visibility: visible;
+}
+
+#shortUrlContainer.is-visible {
+    animation: fadeIn 1s
+}
+
+a#shortUrlOutput {
+    font-size: 20px;
+}
+
+#longUrlError.is-visible {
+    animation: flashInOut 1s;
+}
+

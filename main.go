@@ -153,7 +153,7 @@ func followLinkHandler(c *fiber.Ctx, db *sql.DB) error {
 	var longUrl string
 	res := db.QueryRow("SELECT longurl FROM links WHERE shortCode = ?", sc)
 	if err := res.Scan(&longUrl); err == sql.ErrNoRows {
-		return c.Status(fiber.StatusNotFound).JSON(ErrorResponse{Error: "Not found", Description: "A link with that short code was not found"})
+		return c.Status(fiber.StatusNotFound).Render("notFound", nil)
 	}
 
 	return c.Status(fiber.StatusPermanentRedirect).Redirect(longUrl)
@@ -212,7 +212,13 @@ func shortCodeInUse(db *sql.DB, shortCode string) bool {
 }
 
 func formShortUrl(shortCode string) string {
-	host := getLocalIP()
+	var host string
+
+	if *localhostFlag {
+		host = "localhost"
+	} else {
+		host = getLocalIP()
+	}
 
 	shortUrl := "http://" + host + ":" + port + shortUrlPath + shortCode
 	log.Infof("Generated short URL: %s", shortUrl)

@@ -2,29 +2,36 @@
 <html>
 
 <head>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
-        crossorigin="anonymous"></script>
-    <script src="index.js"></script>
-    <title>URL Shortener</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
+    crossorigin="anonymous"></script>
+  <script src="index.js"></script>
+  <link rel="stylesheet" href="style.css">
+  <title>URL Shortener</title>
 </head>
 
 <body>
-    <div class="container text-center">
-        <div class="row">
-
-          <div class="col">
-            <h1>URL Shortener</h1>
-            <form action="/shorten" method="POST">
-                <input class="my-5" type="longUrl" id="longUrl" name="longUrl" placeholder="https://www.example.com"><br>
-                <input type="submit" id="submitButton" value="Shorten">
-            </form>
+  <div class="container text-center">
+    <div class="row">
+      <div class="col">
+        <h1>URL Shortener</h1>
+        <form id="longUrlForm" action="/shorten" method="POST">
+          <div>
+            <input type="url" id="longUrl" name="longUrl" placeholder="https://www.example.com">
+            <br><span class="toggle-visible" id="longUrlError">.</span>
           </div>
-          <a target="_blank" rel="noopener" id="shortUrlOutput">
+          <input class="my-5" type="submit" id="submitButton" value="Shorten">
+        </form>
+        <div class="toggle-visible my-5" id="shortUrlContainer">
+          <h2>Shortened URL:</h2>
+          <a target="_blank" rel="noopener" id="shortUrlOutput"></a>
         </div>
+
       </div>
+    </div>
+  </div>
 </body>
 
 </html>
