@@ -3,7 +3,9 @@ package main
 import (
 	"database/sql"
 	"flag"
+	"fmt"
 	"math/rand"
+	"net"
 	"net/url"
 	"regexp"
 
@@ -29,9 +31,14 @@ var validUrl = regexp.MustCompile(`(https?:\/\/)([\w\-])+\.{1}([a-zA-Z]{2,63})([
 // Command line flags
 var modeFlag = flag.String("mode", "production", "Set whether to use the 'production' or 'test' database. Defaults to production mode.")
 var resetDbFlag = flag.Bool("reset", false, "Set to reset the database to default on startup")
+var localhostFlag = flag.Bool("localhost", false, "Set whether to listen on localhost or the current IP")
 
 type ShortenReq struct {
 	LongUrl string `json:"longUrl"`
+}
+
+type ShortenRes struct {
+	ShortUrl string `json:"shortUrl"`
 }
 
 type Link struct {
@@ -46,6 +53,11 @@ type ErrorResponse struct {
 	Description string
 }
 
+type Config struct {
+	Testing bool
+	Reset   bool
+}
+
 func main() {
 
 	flag.Parse()
@@ -55,24 +67,29 @@ func main() {
 		log.Fatalf("App startup failed - %s is not a valid mode", *modeFlag)
 	}
 
-	app := initApp()
-	app.Listen(IP + ":" + port)
+	app := initApp(Config{Testing: false})
+
+	var listenOn string
+	if *localhostFlag {
+		listenOn = IP + ":" + port
+	} else {
+		listenOn = getLocalIP() + ":" + port
+	}
+	fmt.Println(listenOn)
+	app.Listen(listenOn)
 }
 
-func initApp() *fiber.App {
+func initApp(config Config) *fiber.App {
 
 	// Choose database and connect
 	var dbPath string
-	switch *modeFlag {
-	case "test":
+	if config.Testing || *modeFlag == "test" {
 		dbPath = testDbPath
-	case "production":
-		dbPath = prodDbPath
-	default:
+	} else {
 		dbPath = prodDbPath
 	}
 
-	if *resetDbFlag {
+	if *resetDbFlag || config.Reset {
 		ResetDb(dbPath)
 	}
 
@@ -118,19 +135,20 @@ func shortenHandler(c *fiber.Ctx, db *sql.DB) error {
 		LongUrl:   sr.LongUrl,
 	}
 
+	var sRes = ShortenRes{
+		ShortUrl: su,
+	}
+
 	_, err = db.Exec("INSERT into links (longurl, shorturl, shortcode) VALUES (?, ?, ?)", l.LongUrl, l.ShortUrl, l.ShortCode)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(ErrorResponse{Error: "Database error", Description: "Couldn't add your link to the database :("})
 	}
 
-	return c.Status(fiber.StatusCreated).JSON(l.ShortUrl)
+	return c.Status(fiber.StatusCreated).JSON(sRes)
 }
 
 func followLinkHandler(c *fiber.Ctx, db *sql.DB) error {
 	sc := c.Params("shortCode")
-	if sc == "" {
-		return c.Status(fiber.StatusBadRequest).JSON(ErrorResponse{Error: "Invalid short code", Description: "No short code provided"})
-	}
 
 	var longUrl string
 	res := db.QueryRow("SELECT longurl FROM links WHERE shortCode = ?", sc)
@@ -194,12 +212,25 @@ func shortCodeInUse(db *sql.DB, shortCode string) bool {
 }
 
 func formShortUrl(shortCode string) string {
-	var portString string
-	if len(port) > 0 {
-		portString = ":" + port
-	}
+	host := getLocalIP()
 
-	shortUrl := "http://" + IP + portString + shortUrlPath + shortCode
+	shortUrl := "http://" + host + ":" + port + shortUrlPath + shortCode
 	log.Infof("Generated short URL: %s", shortUrl)
 	return shortUrl
+}
+
+func getLocalIP() string {
+	addrs, err := net.InterfaceAddrs()
+	if err != nil {
+		log.Warn("Problem getting network interfaces")
+	}
+
+	for _, address := range addrs {
+		if ipnet, ok := address.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
+			if ipnet.IP.To4() != nil {
+				return ipnet.IP.String()
+			}
+		}
+	}
+	return "n/a"
 }

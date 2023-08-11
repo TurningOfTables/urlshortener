@@ -7,6 +7,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
         crossorigin="anonymous"></script>
+    <script src="index.js"></script>
     <title>URL Shortener</title>
 </head>
 
@@ -17,11 +18,11 @@
           <div class="col">
             <h1>URL Shortener</h1>
             <form action="/shorten" method="POST">
-                <input type="longUrl" id="longUrl" name="longUrl" placeholder="https://www.example.com"><br>
-                <input type="submit" value="Shorten">
+                <input class="my-5" type="longUrl" id="longUrl" name="longUrl" placeholder="https://www.example.com"><br>
+                <input type="submit" id="submitButton" value="Shorten">
             </form>
           </div>
-
+          <a target="_blank" rel="noopener" id="shortUrlOutput">
         </div>
       </div>
 </body>
